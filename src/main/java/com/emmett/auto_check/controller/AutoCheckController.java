@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AutoCheckController {
 
     @PostMapping("/doCheck")
-    public Result<?> importData() {
+    public Result<?> doCheck() {
         return Result.ok();
     }
 }
