@@ -22,11 +22,13 @@ public class HttpUtil {
      * @param params
      * @return
      */
-    public static String formBodyPost(String requestUrl, HashMap<String,String> params) {
+    public static Response formBodyPost(String requestUrl, HashMap<String,String> params) {
         FormBody.Builder builder = new FormBody.Builder();
-        for (String key : params.keySet()) {
-            if (ObjectUtil.isNotEmpty(params.get(key))) {
-                builder.add(key, params.get(key));
+        if (ObjectUtil.isNotEmpty(params)) {
+            for (String key : params.keySet()) {
+                if (ObjectUtil.isNotEmpty(params.get(key))) {
+                    builder.add(key, params.get(key));
+                }
             }
         }
         Request request = new Request.Builder()
@@ -42,8 +44,7 @@ public class HttpUtil {
                 .build();
 
         try {
-            Response response = client.newCall(request).execute();
-            return response.body().string();
+            return client.newCall(request).execute();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -55,7 +56,7 @@ public class HttpUtil {
      * @param params
      * @return
      */
-    public static String jsonBodyPost(String requestUrl, Object params) {
+    public static Response jsonBodyPost(String requestUrl, Object params) {
         Request request = new Request.Builder()
                 .url(requestUrl)
                 .post(RequestBody.create(MediaType.get(MediaTypeEnum.APPLICATION_JSON.getMediaType()), new Gson().toJson(params)))
@@ -68,8 +69,7 @@ public class HttpUtil {
                 .build();
 
         try {
-            Response response = client.newCall(request).execute();
-            return response.body().string();
+            return client.newCall(request).execute();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -80,7 +80,7 @@ public class HttpUtil {
      * @param requestUrl
      * @return
      */
-    public static String jsonGet(String requestUrl) {
+    public static Response jsonGet(String requestUrl) {
         Request request = new Request.Builder()
                 .url(requestUrl)
                 .addHeader("content-type", MediaTypeEnum.APPLICATION_JSON.getMediaType())
@@ -94,8 +94,7 @@ public class HttpUtil {
                 .build();
 
         try {
-            Response response = client.newCall(request).execute();
-            return response.body().string();
+            return client.newCall(request).execute();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
