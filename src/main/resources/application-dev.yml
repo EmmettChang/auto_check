@@ -1,2 +1,6 @@
 server:
   port: 8088
+
+login:
+  id: 101237
+  name: 123abc
