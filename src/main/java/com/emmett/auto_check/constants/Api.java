@@ -8,5 +8,6 @@ public interface Api {
     String LoginRequestUrl = "http://10.200.24.172/eqms/login?p_username=%s&p_password=%s";
     String queryTaskRequestUrl = "http://10.200.24.172/eqms/service/QCRT0101/query";
     String queryTaskDetailRequestUrl = "http://10.200.24.172/eqms/service/QCRT0101/queryXC";
+    String updateTaskDetailRequestUrl = "http://10.200.24.172/eqms/service/QCRT0101/updateXc";
     String completedRequestUrl = "http://10.200.24.172/eqms/service/QCRT0101/completed";
 }

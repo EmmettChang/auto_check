@@ -42,7 +42,7 @@ public class AutoCheckService implements IAutoCheckService {
             String loginUrl = String.format(Api.LoginRequestUrl, id, name);
             log.info(loginUrl);
             HashMap<String,String> loginParams = new HashMap<>();
-            Response response = HttpUtil.formBodyPost(loginUrl, loginParams);
+            Response response = HttpUtil.formBodyPost(loginUrl, loginParams, null);
             List<String> loginCookies = response.headers("Set-Cookie");
             fixedCookie = getFixedCookie(loginCookies);
             newCookie = getNewCookie(loginCookies);
@@ -57,7 +57,7 @@ public class AutoCheckService implements IAutoCheckService {
             QueryTaskReAndResBody queryTaskRequetBody = new Gson().fromJson(requetBody.getQueryTaskRequetBodyString(), QueryTaskReAndResBody.class);
             queryTaskRequetBody.setEfSecurityToken(fixedCookie);
             queryTaskRequetBody.setCOOKIE(newCookie);
-            Response response = HttpUtil.jsonBodyPost(queryTaskRequestUrl, queryTaskRequetBody);
+            Response response = HttpUtil.jsonBodyPost(queryTaskRequestUrl, queryTaskRequetBody, fixedCookie + newCookie);
             List<String> loginCookies = response.headers("Set-Cookie");
             newCookie = getNewCookie(loginCookies);
             log.info(newCookie);
@@ -74,7 +74,7 @@ public class AutoCheckService implements IAutoCheckService {
                 QueryTaskDetailRequetBody queryTaskDetailRequetBody = new Gson().fromJson(requetBody.getQueryTaskDetailRequetBodyString(), QueryTaskDetailRequetBody.class);
                 queryTaskDetailRequetBody.setCheckStandardId(row.get(6));
                 queryTaskDetailRequetBody.setCheckPlanInternalCode(row.get(24));
-                Response dateilResponses = HttpUtil.jsonBodyPost(queryTaskDetailRequestUrl, queryTaskDetailRequetBody);
+                Response dateilResponses = HttpUtil.jsonBodyPost(queryTaskDetailRequestUrl, queryTaskDetailRequetBody, fixedCookie + newCookie);
                 List<String> loginCookies = dateilResponses.headers("Set-Cookie");
                 newCookie = getNewCookie(loginCookies);
                 log.info(newCookie);
@@ -97,8 +97,11 @@ public class AutoCheckService implements IAutoCheckService {
                     }
                     break;*/
 
+                CompletedRequestBody updateRequestBody = new Gson().fromJson(requetBody.getCompletedRequetBodyString(), CompletedRequestBody.class);
+                Response updateResponses = HttpUtil.jsonBodyPost(updateTaskDetailRequestUrl, updateRequestBody, fixedCookie + newCookie);
+
                 CompletedRequestBody completedRequestBody = new Gson().fromJson(requetBody.getCompletedRequetBodyString(), CompletedRequestBody.class);
-                Response completedResponses = HttpUtil.jsonBodyPost(completedRequestUrl, completedRequestBody);
+                Response completedResponses = HttpUtil.jsonBodyPost(completedRequestUrl, completedRequestBody, fixedCookie + newCookie);
 
             }
         } catch (Exception e) {
