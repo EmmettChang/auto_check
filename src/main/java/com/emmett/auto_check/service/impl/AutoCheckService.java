@@ -1,5 +1,6 @@
 package com.emmett.auto_check.service.impl;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.emmett.auto_check.constants.Api;
 import com.emmett.auto_check.domain.*;
 import com.emmett.auto_check.service.IAutoCheckService;
@@ -42,10 +43,10 @@ public class AutoCheckService implements IAutoCheckService {
             String loginUrl = String.format(Api.LoginRequestUrl, username, password);
             log.info(loginUrl);
             HashMap<String,String> loginParams = new HashMap<>();
-            Response response = HttpUtil.formBodyPost(loginUrl, loginParams, null);
-            List<String> loginCookies = response.headers("Set-Cookie");
-            fixedCookie = getFixedCookie(loginCookies);
-            newCookie = getNewCookie(loginCookies);
+            Response response = HttpUtil.formBodyPost(loginUrl, loginParams);
+            List<String> cookies = response.headers("Set-Cookie");
+            fixedCookie = getFixedCookie(cookies);
+            newCookie = getNewCookie(cookies);
             log.info(newCookie);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -58,8 +59,10 @@ public class AutoCheckService implements IAutoCheckService {
             queryTaskRequetBody.setEfSecurityToken(fixedCookie);
             queryTaskRequetBody.setCOOKIE(newCookie);
             Response response = HttpUtil.jsonBodyPost(queryTaskRequestUrl, queryTaskRequetBody, fixedCookie + newCookie);
-            List<String> loginCookies = response.headers("Set-Cookie");
-            newCookie = getNewCookie(loginCookies);
+            List<String> cookies = response.headers("Set-Cookie");
+            if (ObjectUtil.isNotEmpty(cookies)) {
+                newCookie = getNewCookie(cookies);
+            }
             log.info(newCookie);
             assert response.body() != null;
             QueryTaskReAndResBody queryTaskResultBody = new Gson().fromJson(response.body().toString(), QueryTaskReAndResBody.class);
@@ -75,8 +78,10 @@ public class AutoCheckService implements IAutoCheckService {
                 queryTaskDetailRequetBody.setCheckStandardId(row.get(6));
                 queryTaskDetailRequetBody.setCheckPlanInternalCode(row.get(24));
                 Response dateilResponses = HttpUtil.jsonBodyPost(queryTaskDetailRequestUrl, queryTaskDetailRequetBody, fixedCookie + newCookie);
-                List<String> loginCookies = dateilResponses.headers("Set-Cookie");
-                newCookie = getNewCookie(loginCookies);
+                List<String> cookies = dateilResponses.headers("Set-Cookie");
+                if (ObjectUtil.isNotEmpty(cookies)) {
+                    newCookie = getNewCookie(cookies);
+                }
                 log.info(newCookie);
                 assert dateilResponses.body() != null;
                 QueryTaskDetailResultBody queryTaskDetailResultBody = new Gson().fromJson(dateilResponses.body().toString(), QueryTaskDetailResultBody.class);

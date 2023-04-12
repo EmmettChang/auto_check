@@ -24,7 +24,7 @@ public class HttpUtil {
      * @param params
      * @return
      */
-    public static Response formBodyPost(String requestUrl, HashMap<String,String> params, String cookie) {
+    public static Response formBodyPost(String requestUrl, HashMap<String,String> params) {
         FormBody.Builder builder = new FormBody.Builder();
         if (ObjectUtil.isNotEmpty(params)) {
             for (String key : params.keySet()) {
@@ -39,7 +39,6 @@ public class HttpUtil {
                 .url(requestUrl)
                 .addHeader("content-type", MediaTypeEnum.APPLICATION_FORM_URLENCODED_VALUE.getMediaType())
                 .post(builder.build())
-                .header("Cookie", cookie)
                 .build();
 
         OkHttpClient client = getHttpClient(cookieJar);
