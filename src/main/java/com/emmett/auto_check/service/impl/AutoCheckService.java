@@ -26,10 +26,10 @@ import static com.emmett.auto_check.constants.Api.*;
 @Service
 public class AutoCheckService implements IAutoCheckService {
 
-    @Value("${login.id}")
-    private String id;
-    @Value("${login.name}")
-    private String name;
+    @Value("${login.username}")
+    private String username;
+    @Value("${login.password}")
+    private String password;
 
     @Override
     public void doCheck() {
@@ -39,7 +39,7 @@ public class AutoCheckService implements IAutoCheckService {
 
         // 登录接口，获取cookie
         try {
-            String loginUrl = String.format(Api.LoginRequestUrl, id, name);
+            String loginUrl = String.format(Api.LoginRequestUrl, username, password);
             log.info(loginUrl);
             HashMap<String,String> loginParams = new HashMap<>();
             Response response = HttpUtil.formBodyPost(loginUrl, loginParams, null);
