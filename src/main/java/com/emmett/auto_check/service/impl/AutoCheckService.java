@@ -35,8 +35,8 @@ public class AutoCheckService implements IAutoCheckService {
     @Override
     public void doCheck() {
         RequetBody requetBody = new RequetBody();
-        String fixedCookie = null;
-        String newCookie = null;
+        String fixedCookie = "";
+        String newCookie = "";
 
         // 登录接口，获取cookie
         try {
