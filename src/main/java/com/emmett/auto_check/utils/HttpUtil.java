@@ -3,6 +3,7 @@ package com.emmett.auto_check.utils;
 import cn.hutool.core.util.ObjectUtil;
 import com.emmett.auto_check.enums.MediaTypeEnum;
 import com.google.gson.Gson;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 
 import java.io.IOException;
@@ -16,6 +17,7 @@ import java.util.concurrent.TimeUnit;
  * @description http请求
  * @date Created in 2023/04/10
  */
+@Slf4j
 public class HttpUtil {
 
     /**
@@ -94,7 +96,7 @@ public class HttpUtil {
                 .build();
 
         OkHttpClient client = getHttpClient(cookieJar);
-
+        log.info(request.headers().toString());
         try {
             return client.newCall(request).execute();
         } catch (IOException e) {
