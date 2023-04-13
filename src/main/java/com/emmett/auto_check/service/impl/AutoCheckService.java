@@ -47,6 +47,7 @@ public class AutoCheckService implements IAutoCheckService {
             List<String> cookies = response.headers("Set-Cookie");
             fixedCookie = getFixedCookie(cookies);
             newCookie = getNewCookie(cookies);
+            log.info(fixedCookie);
             log.info(newCookie);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -143,7 +144,7 @@ public class AutoCheckService implements IAutoCheckService {
         for (String val : cookies) {
             if (val.startsWith("i")) {
                 int index = val.indexOf(";");
-                fixedCookie = val.substring(0, index + 1);
+                fixedCookie = val.substring(0, index);
                 break;
             }
         }
