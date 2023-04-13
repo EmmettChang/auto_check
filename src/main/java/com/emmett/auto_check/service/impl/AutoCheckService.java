@@ -54,11 +54,11 @@ public class AutoCheckService implements IAutoCheckService {
 
         // 页面接口，获取token
         try {
-            Response response = HttpUtil.jsonGet(QCRT0101RequestUrl, newCookie + fixedCookie);
+            Response response = HttpUtil.jsonGet(QCRT0101RequestUrl, newCookie + " iplat.theme=ant; " + fixedCookie);
             List<String> cookies = response.headers("Set-Cookie");
             newCookie = getNewCookie(cookies);
             log.info(newCookie);
-            log.info(response.toString());
+            log.info(response.body().string());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
