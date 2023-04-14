@@ -40,10 +40,10 @@ public class AutoCheckService implements IAutoCheckService {
 
         // 登录接口，获取cookie
         try {
-            String loginUrl = String.format(Api.LoginRequestUrl, username, password);
-            log.info(loginUrl);
             HashMap<String,String> loginParams = new HashMap<>();
-            Response response = HttpUtil.formBodyPost(loginUrl, loginParams);
+            loginParams.put("p_username", username);
+            loginParams.put("p_password", password);
+            Response response = HttpUtil.formBodyPost(Api.LoginRequestUrl, loginParams);
             List<String> cookies = response.headers("Set-Cookie");
             fixedCookie = getFixedCookie(cookies);
             newCookie = getNewCookie(cookies);
