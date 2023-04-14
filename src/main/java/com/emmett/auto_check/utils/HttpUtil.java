@@ -41,7 +41,7 @@ public class HttpUtil {
                 .url(requestUrl)
                 .addHeader("content-type", MediaTypeEnum.APPLICATION_FORM_URLENCODED_VALUE.getMediaType())
                 .post(builder.build())
-                .header("Connection", "keep-alive")
+                .addHeader("Connection", "keep-alive")
                 .build();
 
         OkHttpClient client = getHttpClient(cookieJar);
@@ -66,8 +66,8 @@ public class HttpUtil {
         Request request = new Request.Builder()
                 .url(requestUrl)
                 .post(RequestBody.create(MediaType.get(MediaTypeEnum.APPLICATION_JSON.getMediaType()), new Gson().toJson(params)))
-                .header("Cookie", cookie)
-                .header("Connection", "keep-alive")
+                .addHeader("Cookie", cookie)
+                .addHeader("Connection", "keep-alive")
                 .build();
 
         OkHttpClient client = getHttpClient(cookieJar);
@@ -90,9 +90,9 @@ public class HttpUtil {
         Request request = new Request.Builder()
                 .url(requestUrl)
                 .addHeader("content-type", MediaTypeEnum.APPLICATION_JSON.getMediaType())
+                .addHeader("Cookie", cookie)
+                .addHeader("Connection", "keep-alive")
                 .get()
-                .header("Cookie", cookie)
-                .header("Connection", "keep-alive")
                 .build();
 
         OkHttpClient client = getHttpClient(cookieJar);
