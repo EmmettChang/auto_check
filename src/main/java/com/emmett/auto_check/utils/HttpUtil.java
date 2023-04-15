@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -58,21 +59,21 @@ public class HttpUtil {
      * @return
      */
     public static Response jsonToFormBodyPost(String requestUrl, Object obj) {
-        FormBody.Builder builder = new FormBody.Builder();
-
-        Gson gson = new Gson();
-        String jsonStr = gson.toJson(obj);
-        JsonObject jsonObject = gson.fromJson(jsonStr, JsonObject.class);
-        for (Map.Entry<String, JsonElement> entry : jsonObject.entrySet()) {
-            String name = entry.getKey();
-            String value = entry.getValue().getAsString();
-            builder.add(name, value);
-        }
+//        FormBody.Builder builder = new FormBody.Builder();
+//
+//        Gson gson = new Gson();
+//        String jsonStr = gson.toJson(obj);
+//        JsonObject jsonObject = gson.fromJson(jsonStr, JsonObject.class);
+//        for (Map.Entry<String, JsonElement> entry : jsonObject.entrySet()) {
+//            String name = entry.getKey();
+//            String value = entry.getValue().getAsString();
+//            builder.add(name, value);
+//        }
 
         Request request = new Request.Builder()
                 .url(requestUrl)
                 .addHeader("content-type", MediaTypeEnum.APPLICATION_FORM_URLENCODED_VALUE.getMediaType())
-                .post(builder.build())
+                .post(convertObjectToFormBody(obj))
                 .build();
         try {
             return client.newCall(request).execute();
@@ -126,5 +127,34 @@ public class HttpUtil {
                 .connectTimeout(6000, TimeUnit.SECONDS)
                 .cookieJar(cookieJar)
                 .build();
+    }
+
+    public static RequestBody convertObjectToFormBody(Object obj) {
+        if (obj == null) {
+            return null;
+        }
+
+        FormBody.Builder formBuilder = new FormBody.Builder();
+        Class<?> clazz = obj.getClass();
+        Field[] fields = clazz.getDeclaredFields();
+        for (Field field : fields) {
+            field.setAccessible(true);
+            String fieldName = field.getName();
+            Object fieldValue;
+            try {
+                fieldValue = field.get(obj);
+            } catch (IllegalAccessException e) {
+                continue;
+            }
+
+            if (fieldValue == null) {
+                continue;
+            }
+
+            String fieldValueStr = fieldValue.toString();
+            formBuilder.addEncoded(fieldName, fieldValueStr);
+        }
+
+        return formBuilder.build();
     }
 }
