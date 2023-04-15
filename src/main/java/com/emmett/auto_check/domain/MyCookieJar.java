@@ -16,7 +16,6 @@ public class MyCookieJar implements CookieJar {
     @Override
     public synchronized void saveFromResponse(HttpUrl url, List<Cookie> cookies) {
         this.cookies.addAll(cookies);
-        log.info(cookies.toString());
     }
 
     @Override
