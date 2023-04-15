@@ -20,6 +20,8 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class HttpUtil {
 
+    private static final CookieJar cookieJar = getCookieJar();
+
     /**
      * form 表单提交 发送请求
      * @param requestUrl
@@ -35,7 +37,6 @@ public class HttpUtil {
                 }
             }
         }
-        CookieJar cookieJar = getCookieJar();
 
         Request request = new Request.Builder()
                 .url(requestUrl)
@@ -60,8 +61,6 @@ public class HttpUtil {
      */
 
     public static Response jsonBodyPost(String requestUrl, Object params, String cookie) {
-        CookieJar cookieJar = getCookieJar();
-
         Request request = new Request.Builder()
                 .url(requestUrl)
                 .post(RequestBody.create(MediaType.get(MediaTypeEnum.APPLICATION_JSON.getMediaType()), new Gson().toJson(params)))
@@ -83,8 +82,6 @@ public class HttpUtil {
      * @return
      */
     public static Response jsonGet(String requestUrl, String cookie) {
-        CookieJar cookieJar = getCookieJar();
-
         Request request = new Request.Builder()
                 .url(requestUrl)
                 .addHeader("Cookie", cookie)
