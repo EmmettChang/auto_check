@@ -10,7 +10,13 @@ import lombok.extern.slf4j.Slf4j;
 import okhttp3.Response;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.xml.sax.InputSource;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -35,18 +41,10 @@ public class AutoCheckService implements IAutoCheckService {
     @Override
     public void doCheck() {
         RequetBody requetBody = new RequetBody();
-        String fixedCookie = "";
-        String newCookie = "";
-//, newCookie + " iplat.theme=ant; " + fixedCookie
 
         // 页面接口，获取token
         try {
             Response response = HttpUtil.jsonGet(LoginJspRequestUrl);
-//            List<String> cookies = response.headers("Set-Cookie");
-//            fixedCookie = getFixedCookie(cookies);
-//            newCookie = getNewCookie(cookies);
-//            log.info(fixedCookie);
-//            log.info(newCookie);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -56,9 +54,6 @@ public class AutoCheckService implements IAutoCheckService {
             String loginUrl = String.format(Api.LoginRequestUrl, username, password);
             HashMap<String,String> loginParams = new HashMap<>();
             Response response = HttpUtil.formBodyPost(loginUrl, loginParams);
-//            List<String> cookies = response.headers("Set-Cookie");
-//            fixedCookie = getFixedCookie(cookies);
-//            newCookie = getNewCookie(cookies);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -66,9 +61,12 @@ public class AutoCheckService implements IAutoCheckService {
         // 页面接口，获取token
         try {
             Response response = HttpUtil.jsonGet(QCRT0101RequestUrl);
-//            List<String> cookies = response.headers("Set-Cookie");
-//            newCookie = getNewCookie(cookies);
-            log.info(response.body().string());
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            Document document = builder.parse(new InputSource(new StringReader(response.body().string())));
+            Element efSecurityToken = document.getElementById("efSecurityToken");
+            String value = efSecurityToken.getAttribute("value");
+            log.info(value);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
