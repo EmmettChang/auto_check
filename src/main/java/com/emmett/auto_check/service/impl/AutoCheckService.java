@@ -15,6 +15,8 @@ import org.jsoup.nodes.Element;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -81,8 +83,16 @@ public class AutoCheckService implements IAutoCheckService {
             queryTaskRequetBody.setEfSecurityToken(efSecurityToken);
             queryTaskRequetBody.setCOOKIE(newCookie);
             List<String> strings = queryTaskRequetBody.get__blocks__().getInqu_status().getRows().get(0);
-            strings.set(2, new Date().toString());
-            strings.set(3, new Date().toString());
+            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            // 获取当月第一天
+            LocalDate firstDayOfMonth = LocalDate.now().withDayOfMonth(1);
+            String formattedFirstDayOfMonth = firstDayOfMonth.format(dateTimeFormatter);
+
+            // 获取今天
+            LocalDate today = LocalDate.now();
+            String formattedToday = today.format(dateTimeFormatter);
+            strings.set(2, formattedFirstDayOfMonth);
+            strings.set(3, formattedToday);
             Response response = HttpUtil.jsonBodyPost(queryTaskRequestUrl, queryTaskRequetBody);
             assert response.body() != null;
             QueryTaskReAndResBody queryTaskResultBody = new Gson().fromJson(response.body().toString(), QueryTaskReAndResBody.class);
