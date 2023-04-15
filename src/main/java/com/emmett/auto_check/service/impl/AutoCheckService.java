@@ -38,12 +38,23 @@ public class AutoCheckService implements IAutoCheckService {
         String fixedCookie = "";
         String newCookie = "";
 
+
+        // 页面接口，获取token
+        try {
+            Response response = HttpUtil.jsonGet(LoginJspRequestUrl, "iplat.theme=ant;");
+            List<String> cookies = response.headers("Set-Cookie");
+            fixedCookie = getFixedCookie(cookies);
+            newCookie = getNewCookie(cookies);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
         // 登录接口，获取cookie
         try {
             HashMap<String,String> loginParams = new HashMap<>();
             loginParams.put("p_username", username);
             loginParams.put("p_password", password);
-            Response response = HttpUtil.formBodyPost(Api.LoginRequestUrl, loginParams);
+            Response response = HttpUtil.formBodyPost(Api.LoginRequestUrl, loginParams, newCookie + " iplat.theme=ant; " + fixedCookie);
             List<String> cookies = response.headers("Set-Cookie");
             fixedCookie = getFixedCookie(cookies);
             newCookie = getNewCookie(cookies);
