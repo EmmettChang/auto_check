@@ -59,22 +59,13 @@ public class HttpUtil {
      * @return
      */
     public static Response jsonToFormBodyPost(String requestUrl, Object obj) {
-//        FormBody.Builder builder = new FormBody.Builder();
-//
-//        Gson gson = new Gson();
-//        String jsonStr = gson.toJson(obj);
-//        JsonObject jsonObject = gson.fromJson(jsonStr, JsonObject.class);
-//        for (Map.Entry<String, JsonElement> entry : jsonObject.entrySet()) {
-//            String name = entry.getKey();
-//            String value = entry.getValue().getAsString();
-//            builder.add(name, value);
-//        }
 
         Request request = new Request.Builder()
                 .url(requestUrl)
                 .addHeader("content-type", MediaTypeEnum.APPLICATION_FORM_URLENCODED_VALUE.getMediaType())
                 .post(convertObjectToFormBody(obj))
                 .build();
+        log.info(request.toString());
         try {
             return client.newCall(request).execute();
         } catch (IOException e) {
