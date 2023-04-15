@@ -43,7 +43,6 @@ public class HttpUtil {
                 .post(builder.build())
                 .build();
         try {
-            log.info(client.newCall(request).toString());
             return client.newCall(request).execute();
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -80,7 +79,6 @@ public class HttpUtil {
                 .get()
                 .build();
         try {
-            log.info(client.newCall(request).toString());
             return client.newCall(request).execute();
         } catch (IOException e) {
             throw new RuntimeException(e);
