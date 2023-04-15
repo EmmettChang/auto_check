@@ -1,5 +1,6 @@
 package com.emmett.auto_check.domain;
 
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.Cookie;
 import okhttp3.CookieJar;
 import okhttp3.HttpUrl;
@@ -7,6 +8,7 @@ import okhttp3.HttpUrl;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 public class MyCookieJar implements CookieJar {
 
     private final List<Cookie> cookies = new ArrayList<>();
@@ -14,6 +16,7 @@ public class MyCookieJar implements CookieJar {
     @Override
     public synchronized void saveFromResponse(HttpUrl url, List<Cookie> cookies) {
         this.cookies.addAll(cookies);
+        log.info(cookies.toString());
     }
 
     @Override
