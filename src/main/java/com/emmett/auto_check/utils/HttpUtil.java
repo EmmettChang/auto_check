@@ -97,7 +97,6 @@ public class HttpUtil {
                 .build();
 
         OkHttpClient client = getHttpClient(cookieJar);
-        log.info(request.headers().toString());
         try {
             return client.newCall(request).execute();
         } catch (IOException e) {

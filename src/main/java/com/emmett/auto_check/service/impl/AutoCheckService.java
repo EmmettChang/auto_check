@@ -58,8 +58,6 @@ public class AutoCheckService implements IAutoCheckService {
             List<String> cookies = response.headers("Set-Cookie");
             fixedCookie = getFixedCookie(cookies);
             newCookie = getNewCookie(cookies);
-            log.info(fixedCookie);
-            log.info(newCookie);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -69,7 +67,6 @@ public class AutoCheckService implements IAutoCheckService {
             Response response = HttpUtil.jsonGet(QCRT0101RequestUrl, newCookie + " iplat.theme=ant; " + fixedCookie);
             List<String> cookies = response.headers("Set-Cookie");
             newCookie = getNewCookie(cookies);
-            log.info(newCookie);
             log.info(response.body().string());
         } catch (Exception e) {
             throw new RuntimeException(e);
