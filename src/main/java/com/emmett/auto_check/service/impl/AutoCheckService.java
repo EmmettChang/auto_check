@@ -41,20 +41,21 @@ public class AutoCheckService implements IAutoCheckService {
 
         // 页面接口，获取token
         try {
-            Response response = HttpUtil.jsonGet(LoginJspRequestUrl, "iplat.theme=ant;");
+            Response response = HttpUtil.jsonGet(LoginJspRequestUrl, "");
             List<String> cookies = response.headers("Set-Cookie");
             fixedCookie = getFixedCookie(cookies);
             newCookie = getNewCookie(cookies);
+            log.info(fixedCookie);
+            log.info(newCookie);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
 
         // 登录接口，获取cookie
         try {
+            String loginUrl = String.format(Api.LoginRequestUrl, username, password);
             HashMap<String,String> loginParams = new HashMap<>();
-            loginParams.put("p_username", username);
-            loginParams.put("p_password", password);
-            Response response = HttpUtil.formBodyPost(Api.LoginRequestUrl, loginParams, newCookie + " iplat.theme=ant; " + fixedCookie);
+            Response response = HttpUtil.formBodyPost(loginUrl, loginParams, newCookie + " iplat.theme=ant; " + fixedCookie);
             List<String> cookies = response.headers("Set-Cookie");
             fixedCookie = getFixedCookie(cookies);
             newCookie = getNewCookie(cookies);
@@ -138,7 +139,7 @@ public class AutoCheckService implements IAutoCheckService {
     public String getNewCookie(List<String> cookies) {
         String newCookie = "";
         for (String val : cookies) {
-            if (val.startsWith("J")) {
+            if (val.startsWith("JSESSIONID")) {
                 int index = val.indexOf(";");
                 newCookie = val.substring(0, index + 1);
                 break;
@@ -150,7 +151,7 @@ public class AutoCheckService implements IAutoCheckService {
     public String getFixedCookie(List<String> cookies) {
         String fixedCookie = "";
         for (String val : cookies) {
-            if (val.startsWith("i")) {
+            if (val.startsWith("iplat.sessionId")) {
                 int index = val.indexOf(";");
                 fixedCookie = val.substring(0, index);
                 break;
