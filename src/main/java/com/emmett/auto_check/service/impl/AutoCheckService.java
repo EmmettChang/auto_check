@@ -1,27 +1,22 @@
 package com.emmett.auto_check.service.impl;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.emmett.auto_check.constants.Api;
-import com.emmett.auto_check.domain.*;
+import com.emmett.auto_check.domain.RequetBody;
 import com.emmett.auto_check.service.IAutoCheckService;
 import com.emmett.auto_check.utils.HttpUtil;
-import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.Response;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.xml.sax.InputSource;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import java.io.StringReader;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import static com.emmett.auto_check.constants.Api.*;
+import static com.emmett.auto_check.constants.Api.LoginJspRequestUrl;
+import static com.emmett.auto_check.constants.Api.QCRT0101RequestUrl;
 
 /**
  * Description: 申请开票
@@ -61,11 +56,10 @@ public class AutoCheckService implements IAutoCheckService {
         // 页面接口，获取token
         try {
             Response response = HttpUtil.jsonGet(QCRT0101RequestUrl);
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            Document document = builder.parse(new InputSource(new StringReader(response.body().string())));
-            Element efSecurityToken = document.getElementById("efSecurityToken");
-            String value = efSecurityToken.getAttribute("value");
+            String html = response.body().string();
+            Document doc = Jsoup.parse(html);
+            Element efSecurityToken = doc.getElementById("efSecurityToken");
+            String value = efSecurityToken.attr("value");
             log.info(value);
         } catch (Exception e) {
             throw new RuntimeException(e);
