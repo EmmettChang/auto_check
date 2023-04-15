@@ -79,10 +79,10 @@ public class AutoCheckService implements IAutoCheckService {
         // 任务查询接口
         List<List<String>> rows = new ArrayList<>();
         try {
-            QueryTaskReAndResBody queryTaskRequetBody = new Gson().fromJson(requetBody.getQueryTaskRequetBodyString(), QueryTaskReAndResBody.class);
-            queryTaskRequetBody.setEfSecurityToken(efSecurityToken);
-            queryTaskRequetBody.setCOOKIE(newCookie);
-            List<String> strings = queryTaskRequetBody.get__blocks__().getInqu_status().getRows().get(0);
+            QueryTaskReAndResBody queryTaskReAndResBody = new Gson().fromJson(requetBody.getQueryTaskRequetBodyString(), QueryTaskReAndResBody.class);
+            queryTaskReAndResBody.setEfSecurityToken(efSecurityToken);
+            queryTaskReAndResBody.setCOOKIE(newCookie);
+            List<String> strings = queryTaskReAndResBody.get__blocks__().getInqu_status().getRows().get(0);
             DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
             // 获取当月第一天
             LocalDate firstDayOfMonth = LocalDate.now().withDayOfMonth(1);
@@ -93,7 +93,7 @@ public class AutoCheckService implements IAutoCheckService {
             String formattedToday = today.format(dateTimeFormatter);
             strings.set(2, formattedFirstDayOfMonth);
             strings.set(3, formattedToday);
-            Response response = HttpUtil.jsonBodyPost(queryTaskRequestUrl, queryTaskRequetBody);
+            Response response = HttpUtil.jsonBodyPost(queryTaskRequestUrl, queryTaskReAndResBody);
             assert response.body() != null;
             QueryTaskReAndResBody queryTaskResultBody = new Gson().fromJson(response.body().toString(), QueryTaskReAndResBody.class);
             rows = queryTaskResultBody.get__blocks__().getResult().getRows();

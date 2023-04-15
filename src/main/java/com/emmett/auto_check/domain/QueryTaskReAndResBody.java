@@ -23,11 +23,11 @@ public class QueryTaskReAndResBody {
     private String efSecurityToken;
     private String COOKIE;
     private String __version__;
-    private QueryTaskReAndResBody_Sys __sys__;
-    private QueryTaskReAndResBody_Blocks __blocks__;
+    private __sys__ __sys__;
+    private __blocks__ __blocks__;
 
     @Data
-    public static class QueryTaskReAndResBody_Sys {
+    public static class __sys__ {
 
         private String name;
         private String descName;
@@ -39,7 +39,7 @@ public class QueryTaskReAndResBody {
     }
 
     @Data
-    public static class QueryTaskReAndResBody_Blocks {
+    public static class __blocks__ {
 
         private Inqu_status inqu_status;
         private Detail1 detail1;
