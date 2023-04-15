@@ -1,6 +1,7 @@
 package com.emmett.auto_check.utils;
 
 import cn.hutool.core.util.ObjectUtil;
+import com.emmett.auto_check.domain.MyCookieJar;
 import com.emmett.auto_check.enums.MediaTypeEnum;
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class HttpUtil {
 
-    private static final CookieJar cookieJar = getCookieJar();
+    private static final CookieJar cookieJar = new MyCookieJar();
 
     /**
      * form 表单提交 发送请求
@@ -94,23 +95,6 @@ public class HttpUtil {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    public static CookieJar getCookieJar() {
-        return new CookieJar() {
-            private final HashMap<HttpUrl, List<Cookie>> cookieStore = new HashMap<>();
-
-            @Override
-            public void saveFromResponse(HttpUrl url, List<Cookie> cookies) {
-                cookieStore.put(url, cookies);
-            }
-
-            @Override
-            public List<Cookie> loadForRequest(HttpUrl url) {
-                List<Cookie> cookies = cookieStore.get(url);
-                return cookies != null ? cookies : new ArrayList<>();
-            }
-        };
     }
 
     public static OkHttpClient getHttpClient(CookieJar cookieJar) {
