@@ -20,9 +20,7 @@ import java.util.concurrent.TimeUnit;
  */
 @Slf4j
 public class HttpUtil {
-
-    private static final CookieJar cookieJar = new MyCookieJar();
-
+    private static final OkHttpClient client = getHttpClient();
     /**
      * form 表单提交 发送请求
      * @param requestUrl
@@ -44,8 +42,6 @@ public class HttpUtil {
                 .addHeader("content-type", MediaTypeEnum.APPLICATION_FORM_URLENCODED_VALUE.getMediaType())
                 .post(builder.build())
                 .build();
-
-        OkHttpClient client = getHttpClient(cookieJar);
         try {
             return client.newCall(request).execute();
         } catch (IOException e) {
@@ -65,9 +61,6 @@ public class HttpUtil {
                 .url(requestUrl)
                 .post(RequestBody.create(MediaType.get(MediaTypeEnum.APPLICATION_JSON.getMediaType()), new Gson().toJson(params)))
                 .build();
-
-        OkHttpClient client = getHttpClient(cookieJar);
-
         try {
             return client.newCall(request).execute();
         } catch (IOException e) {
@@ -85,8 +78,6 @@ public class HttpUtil {
                 .url(requestUrl)
                 .get()
                 .build();
-
-        OkHttpClient client = getHttpClient(cookieJar);
         try {
             return client.newCall(request).execute();
         } catch (IOException e) {
@@ -94,7 +85,9 @@ public class HttpUtil {
         }
     }
 
-    public static OkHttpClient getHttpClient(CookieJar cookieJar) {
+    public static OkHttpClient getHttpClient() {
+        CookieJar cookieJar = new MyCookieJar();
+
         return new OkHttpClient.Builder()
                 .readTimeout(6000, TimeUnit.SECONDS)
                 .writeTimeout(6000, TimeUnit.SECONDS)
