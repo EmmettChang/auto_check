@@ -65,7 +65,7 @@ public class HttpUtil {
                 .addHeader("content-type", MediaTypeEnum.APPLICATION_FORM_URLENCODED_VALUE.getMediaType())
                 .post(convertObjectToFormBody(obj))
                 .build();
-        log.info(request.toString());
+        log.info(request.body().toString());
         try {
             return client.newCall(request).execute();
         } catch (IOException e) {
