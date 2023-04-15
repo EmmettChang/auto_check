@@ -79,10 +79,10 @@ public class AutoCheckService implements IAutoCheckService {
         // 任务查询接口
         List<List<String>> rows = new ArrayList<>();
         try {
-            QueryTaskReAndResBody queryTaskReAndResBody = new Gson().fromJson(requetBody.getQueryTaskRequetBodyString(), QueryTaskReAndResBody.class);
-            queryTaskReAndResBody.setEfSecurityToken(efSecurityToken);
-            queryTaskReAndResBody.setCOOKIE(newCookie);
-            List<String> strings = queryTaskReAndResBody.get__blocks__().getInqu_status().getRows().get(0);
+            QueryTaskReAndResBody queryTaskRequestBody = new Gson().fromJson(requetBody.getQueryTaskRequetBodyString(), QueryTaskReAndResBody.class);
+            queryTaskRequestBody.setEfSecurityToken(efSecurityToken);
+            queryTaskRequestBody.setCOOKIE(newCookie);
+            List<String> strings = queryTaskRequestBody.get__blocks__().getInqu_status().getRows().get(0);
             DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
             // 获取当月第一天
             LocalDate firstDayOfMonth = LocalDate.now().withDayOfMonth(1);
@@ -93,9 +93,10 @@ public class AutoCheckService implements IAutoCheckService {
             String formattedToday = today.format(dateTimeFormatter);
             strings.set(2, formattedFirstDayOfMonth);
             strings.set(3, formattedToday);
-            Response response = HttpUtil.jsonBodyPost(queryTaskRequestUrl, queryTaskReAndResBody);
+            Response response = HttpUtil.jsonBodyPost(queryTaskRequestUrl, queryTaskRequestBody);
             assert response.body() != null;
-            QueryTaskReAndResBody queryTaskResultBody = new Gson().fromJson(response.body().toString(), QueryTaskReAndResBody.class);
+            log.info(response.body().string());
+            QueryTaskReAndResBody queryTaskResultBody = new Gson().fromJson(response.body().string(), QueryTaskReAndResBody.class);
             rows = queryTaskResultBody.get__blocks__().getResult().getRows();
             log.info(rows.toString());
         } catch (Exception e) {
