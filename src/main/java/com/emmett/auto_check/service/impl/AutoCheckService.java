@@ -37,16 +37,16 @@ public class AutoCheckService implements IAutoCheckService {
         RequetBody requetBody = new RequetBody();
         String fixedCookie = "";
         String newCookie = "";
-
+//, newCookie + " iplat.theme=ant; " + fixedCookie
 
         // 页面接口，获取token
         try {
-            Response response = HttpUtil.jsonGet(LoginJspRequestUrl, "");
-            List<String> cookies = response.headers("Set-Cookie");
-            fixedCookie = getFixedCookie(cookies);
-            newCookie = getNewCookie(cookies);
-            log.info(fixedCookie);
-            log.info(newCookie);
+            Response response = HttpUtil.jsonGet(LoginJspRequestUrl);
+//            List<String> cookies = response.headers("Set-Cookie");
+//            fixedCookie = getFixedCookie(cookies);
+//            newCookie = getNewCookie(cookies);
+//            log.info(fixedCookie);
+//            log.info(newCookie);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -55,19 +55,19 @@ public class AutoCheckService implements IAutoCheckService {
         try {
             String loginUrl = String.format(Api.LoginRequestUrl, username, password);
             HashMap<String,String> loginParams = new HashMap<>();
-            Response response = HttpUtil.formBodyPost(loginUrl, loginParams, newCookie + " iplat.theme=ant; " + fixedCookie);
-            List<String> cookies = response.headers("Set-Cookie");
-            fixedCookie = getFixedCookie(cookies);
-            newCookie = getNewCookie(cookies);
+            Response response = HttpUtil.formBodyPost(loginUrl, loginParams);
+//            List<String> cookies = response.headers("Set-Cookie");
+//            fixedCookie = getFixedCookie(cookies);
+//            newCookie = getNewCookie(cookies);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
 
         // 页面接口，获取token
         try {
-            Response response = HttpUtil.jsonGet(QCRT0101RequestUrl, newCookie + " iplat.theme=ant; " + fixedCookie);
-            List<String> cookies = response.headers("Set-Cookie");
-            newCookie = getNewCookie(cookies);
+            Response response = HttpUtil.jsonGet(QCRT0101RequestUrl);
+//            List<String> cookies = response.headers("Set-Cookie");
+//            newCookie = getNewCookie(cookies);
             log.info(response.body().string());
         } catch (Exception e) {
             throw new RuntimeException(e);

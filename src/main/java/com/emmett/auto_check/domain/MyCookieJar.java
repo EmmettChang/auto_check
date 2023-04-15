@@ -18,12 +18,12 @@ public class MyCookieJar implements CookieJar {
 
     @Override
     public synchronized List<Cookie> loadForRequest(HttpUrl url) {
-        List<Cookie> validCookies = new ArrayList<>();
+        List<Cookie> result = new ArrayList<>();
         for (Cookie cookie : cookies) {
             if (cookie.matches(url)) {
-                validCookies.add(cookie);
+                result.add(cookie);
             }
         }
-        return validCookies;
+        return result;
     }
 }

@@ -29,7 +29,7 @@ public class HttpUtil {
      * @param params
      * @return
      */
-    public static Response formBodyPost(String requestUrl, HashMap<String,String> params, String cookie) {
+    public static Response formBodyPost(String requestUrl, HashMap<String,String> params) {
         FormBody.Builder builder = new FormBody.Builder();
         if (ObjectUtil.isNotEmpty(params)) {
             for (String key : params.keySet()) {
@@ -43,7 +43,6 @@ public class HttpUtil {
                 .url(requestUrl)
                 .addHeader("content-type", MediaTypeEnum.APPLICATION_FORM_URLENCODED_VALUE.getMediaType())
                 .post(builder.build())
-                .addHeader("Cookie", cookie)
                 .build();
 
         OkHttpClient client = getHttpClient(cookieJar);
@@ -61,11 +60,10 @@ public class HttpUtil {
      * @return
      */
 
-    public static Response jsonBodyPost(String requestUrl, Object params, String cookie) {
+    public static Response jsonBodyPost(String requestUrl, Object params) {
         Request request = new Request.Builder()
                 .url(requestUrl)
                 .post(RequestBody.create(MediaType.get(MediaTypeEnum.APPLICATION_JSON.getMediaType()), new Gson().toJson(params)))
-                .addHeader("Cookie", cookie)
                 .build();
 
         OkHttpClient client = getHttpClient(cookieJar);
@@ -82,10 +80,9 @@ public class HttpUtil {
      * @param requestUrl
      * @return
      */
-    public static Response jsonGet(String requestUrl, String cookie) {
+    public static Response jsonGet(String requestUrl) {
         Request request = new Request.Builder()
                 .url(requestUrl)
-                .addHeader("Cookie", cookie)
                 .get()
                 .build();
 
