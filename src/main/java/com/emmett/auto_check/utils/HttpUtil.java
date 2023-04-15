@@ -4,6 +4,8 @@ import cn.hutool.core.util.ObjectUtil;
 import com.emmett.auto_check.domain.MyCookieJar;
 import com.emmett.auto_check.enums.MediaTypeEnum;
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 
@@ -11,6 +13,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -35,6 +38,35 @@ public class HttpUtil {
                     builder.add(key, params.get(key));
                 }
             }
+        }
+
+        Request request = new Request.Builder()
+                .url(requestUrl)
+                .addHeader("content-type", MediaTypeEnum.APPLICATION_FORM_URLENCODED_VALUE.getMediaType())
+                .post(builder.build())
+                .build();
+        try {
+            return client.newCall(request).execute();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    /**
+     * form 表单提交 发送请求
+     * @param requestUrl
+     * @param obj
+     * @return
+     */
+    public static Response jsonToFormBodyPost(String requestUrl, Object obj) {
+        FormBody.Builder builder = new FormBody.Builder();
+
+        Gson gson = new Gson();
+        String jsonStr = gson.toJson(obj);
+        JsonObject jsonObject = gson.fromJson(jsonStr, JsonObject.class);
+        for (Map.Entry<String, JsonElement> entry : jsonObject.entrySet()) {
+            String name = entry.getKey();
+            String value = entry.getValue().getAsString();
+            builder.add(name, value);
         }
 
         Request request = new Request.Builder()

@@ -93,7 +93,7 @@ public class AutoCheckService implements IAutoCheckService {
             String formattedToday = today.format(dateTimeFormatter);
             strings.set(2, formattedFirstDayOfMonth);
             strings.set(3, formattedToday);
-            Response response = HttpUtil.jsonBodyPost(queryTaskRequestUrl, queryTaskRequestBody);
+            Response response = HttpUtil.jsonToFormBodyPost(queryTaskRequestUrl, queryTaskRequestBody);
             assert response.body() != null;
             log.info(response.body().string());
             QueryTaskReAndResBody queryTaskResultBody = new Gson().fromJson(response.body().string(), QueryTaskReAndResBody.class);
