@@ -2,8 +2,7 @@ package com.emmett.auto_check.service.impl;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.emmett.auto_check.constants.Api;
-import com.emmett.auto_check.domain.QueryTaskReAndResBody;
-import com.emmett.auto_check.domain.RequetBody;
+import com.emmett.auto_check.domain.*;
 import com.emmett.auto_check.service.IAutoCheckService;
 import com.emmett.auto_check.utils.HttpUtil;
 import com.google.gson.Gson;
@@ -43,7 +42,6 @@ public class AutoCheckService implements IAutoCheckService {
     public void doCheck() {
         RequetBody requetBody = new RequetBody();
         String efSecurityToken = "";
-        String newCookie = "";
 
         // 页面接口，获取token
         try {
@@ -64,24 +62,21 @@ public class AutoCheckService implements IAutoCheckService {
         // 页面接口，获取token
         try {
             Response response = HttpUtil.jsonGet(QCRT0101RequestUrl);
-            List<String> cookies = response.headers("Set-Cookie");
-            if (ObjectUtil.isNotEmpty(cookies)) {
-                newCookie = getNewCookie(cookies);
-            }
             String html = response.body().string();
             Document doc = Jsoup.parse(html);
             Element efSecurityTokenElement = doc.getElementById("efSecurityToken");
             efSecurityToken = efSecurityTokenElement.attr("value");
+            log.info("*******" + efSecurityToken);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-
         // 任务查询接口
         List<List<String>> rows = new ArrayList<>();
         try {
             QueryTaskReAndResBody queryTaskRequestBody = new Gson().fromJson(requetBody.getQueryTaskRequetBodyString(), QueryTaskReAndResBody.class);
             queryTaskRequestBody.setEfSecurityToken(efSecurityToken);
-            queryTaskRequestBody.setCOOKIE(newCookie);
+            queryTaskRequestBody.setCOOKIE(MyCookieJar.getFixCookieValue());
+            log.info(MyCookieJar.getFixCookieValue());
             List<String> strings = queryTaskRequestBody.get__blocks__().getInqu_status().getRows().get(0);
             DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
             // 获取当月第一天
@@ -93,57 +88,51 @@ public class AutoCheckService implements IAutoCheckService {
             String formattedToday = today.format(dateTimeFormatter);
             strings.set(2, formattedFirstDayOfMonth);
             strings.set(3, formattedToday);
-            Response response = HttpUtil.jsonToFormBodyPost(queryTaskRequestUrl, queryTaskRequestBody);
+            Response response = HttpUtil.jsonBodyPost(queryTaskRequestUrl, queryTaskRequestBody, efSecurityToken);
             assert response.body() != null;
-            log.info(response.body().string());
             QueryTaskReAndResBody queryTaskResultBody = new Gson().fromJson(response.body().string(), QueryTaskReAndResBody.class);
             rows = queryTaskResultBody.get__blocks__().getResult().getRows();
-            log.info(rows.toString());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-//
-//        // 任务详情查询后处理数据提交
-//        try {
-//            for (List<String> row : rows) {
-//                QueryTaskDetailRequetBody queryTaskDetailRequetBody = new Gson().fromJson(requetBody.getQueryTaskDetailRequetBodyString(), QueryTaskDetailRequetBody.class);
-//                queryTaskDetailRequetBody.setCheckStandardId(row.get(6));
-//                queryTaskDetailRequetBody.setCheckPlanInternalCode(row.get(24));
-//                Response dateilResponses = HttpUtil.jsonBodyPost(queryTaskDetailRequestUrl, queryTaskDetailRequetBody, newCookie + fixedCookie);
-//                List<String> cookies = dateilResponses.headers("Set-Cookie");
-//                if (ObjectUtil.isNotEmpty(cookies)) {
-//                    newCookie = getNewCookie(cookies);
-//                }
-//                log.info(newCookie);
-//                assert dateilResponses.body() != null;
-//                QueryTaskDetailResultBody queryTaskDetailResultBody = new Gson().fromJson(dateilResponses.body().toString(), QueryTaskDetailResultBody.class);
-//                List<List<String>> detailRows = queryTaskDetailResultBody.get__blocks__().getResultXc().getRows();
-//
-//                /*if (rightTable[j].children[4].innerText == ""温度状态"") {
-//                    leftT.getElementsByTagName(""tr"")[j].children[0].firstElementChild.click();
-//                    await sleep(t);
-//                    data = null;
-//                    data = resultXcGrid.getCheckedRows()[0];
-//                    if (data != null) {
-//                        data.determinant = ""10"";
-//                        data.currentResult = 22;
-//                        saveB.click();
-//                        i++;
-//                    } else {
-//                        t = (t + 5) % 30;
-//                    }
-//                    break;*/
-//
+
+        // 任务详情查询后处理数据提交
+        try {
+            for (List<String> row : rows) {
+                QueryTaskDetailRequetBody queryTaskDetailRequetBody = new Gson().fromJson(requetBody.getQueryTaskDetailRequetBodyString(), QueryTaskDetailRequetBody.class);
+                queryTaskDetailRequetBody.setCheckStandardId(row.get(6));
+                queryTaskDetailRequetBody.setCheckPlanInternalCode(row.get(24));
+                Response dateilResponses = HttpUtil.jsonBodyPost(queryTaskDetailRequestUrl, queryTaskDetailRequetBody, newCookie + fixedCookie);
+                assert dateilResponses.body() != null;
+                QueryTaskDetailResultBody queryTaskDetailResultBody = new Gson().fromJson(dateilResponses.body().toString(), QueryTaskDetailResultBody.class);
+                List<List<String>> detailRows = queryTaskDetailResultBody.get__blocks__().getResultXc().getRows();
+
+
+                /*if (rightTable[j].children[4].innerText == ""温度状态"") {
+                    leftT.getElementsByTagName(""tr"")[j].children[0].firstElementChild.click();
+                    await sleep(t);
+                    data = null;
+                    data = resultXcGrid.getCheckedRows()[0];
+                    if (data != null) {
+                        data.determinant = ""10"";
+                        data.currentResult = 22;
+                        saveB.click();
+                        i++;
+                    } else {
+                        t = (t + 5) % 30;
+                    }
+                    break;*/
+
 //                CompletedRequestBody updateRequestBody = new Gson().fromJson(requetBody.getCompletedRequetBodyString(), CompletedRequestBody.class);
 //                Response updateResponses = HttpUtil.jsonBodyPost(updateTaskDetailRequestUrl, updateRequestBody, newCookie + fixedCookie);
 //
 //                CompletedRequestBody completedRequestBody = new Gson().fromJson(requetBody.getCompletedRequetBodyString(), CompletedRequestBody.class);
 //                Response completedResponses = HttpUtil.jsonBodyPost(completedRequestUrl, completedRequestBody, newCookie + fixedCookie);
-//
-//            }
-//        } catch (Exception e) {
-//            throw new RuntimeException(e);
-//        }
+
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
 
     }
 

@@ -58,11 +58,11 @@ public class HttpUtil {
      * @param obj
      * @return
      */
-    public static Response jsonToFormBodyPost(String requestUrl, Object obj) {
-
+    public static Response jsonToFormBodyPost(String requestUrl, Object obj, String efSecurityToken) {
         Request request = new Request.Builder()
                 .url(requestUrl)
                 .addHeader("content-type", MediaTypeEnum.APPLICATION_FORM_URLENCODED_VALUE.getMediaType())
+                .addHeader("efSecurityToken", efSecurityToken)
                 .post(convertObjectToFormBody(obj))
                 .build();
         try {
@@ -79,10 +79,11 @@ public class HttpUtil {
      * @return
      */
 
-    public static Response jsonBodyPost(String requestUrl, Object params) {
+    public static Response jsonBodyPost(String requestUrl, Object params, String efSecurityToken) {
         Request request = new Request.Builder()
                 .url(requestUrl)
                 .post(RequestBody.create(MediaType.get(MediaTypeEnum.APPLICATION_JSON.getMediaType()), new Gson().toJson(params)))
+                .addHeader("efSecurityToken", efSecurityToken)
                 .build();
         try {
             return client.newCall(request).execute();
