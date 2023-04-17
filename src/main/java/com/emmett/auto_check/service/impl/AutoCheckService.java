@@ -102,7 +102,7 @@ public class AutoCheckService implements IAutoCheckService {
                 QueryTaskDetailRequetBody queryTaskDetailRequetBody = new Gson().fromJson(requetBody.getQueryTaskDetailRequetBodyString(), QueryTaskDetailRequetBody.class);
                 queryTaskDetailRequetBody.setCheckStandardId(row.get(6));
                 queryTaskDetailRequetBody.setCheckPlanInternalCode(row.get(24));
-                Response dateilResponses = HttpUtil.jsonBodyPost(queryTaskDetailRequestUrl, queryTaskDetailRequetBody, newCookie + fixedCookie);
+                Response dateilResponses = HttpUtil.jsonBodyPost(queryTaskDetailRequestUrl, queryTaskDetailRequetBody, efSecurityToken);
                 assert dateilResponses.body() != null;
                 QueryTaskDetailResultBody queryTaskDetailResultBody = new Gson().fromJson(dateilResponses.body().toString(), QueryTaskDetailResultBody.class);
                 List<List<String>> detailRows = queryTaskDetailResultBody.get__blocks__().getResultXc().getRows();
