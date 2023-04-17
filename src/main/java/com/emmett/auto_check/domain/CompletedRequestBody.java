@@ -53,7 +53,7 @@ public class CompletedRequestBody {
 
             private Attr attr;
             private Meta meta;
-            private List<String> rows;
+            private List<List<String>> rows;
 
         }
 
@@ -62,7 +62,7 @@ public class CompletedRequestBody {
 
             private Attr attr;
             private Meta meta;
-            private List<String> rows;
+            private List<List<String>> rows;
 
         }
 
