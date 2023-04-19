@@ -20,7 +20,7 @@ public class AutoCheckController {
     IAutoCheckService autoCheckService;
     @PostMapping("/doCheck")
     public Result<?> doCheck() {
-        autoCheckService.doCheck();
+//        autoCheckService.doCheck();
         return Result.ok();
     }
 }

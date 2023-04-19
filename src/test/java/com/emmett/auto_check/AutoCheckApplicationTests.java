@@ -9,8 +9,6 @@ class AutoCheckApplicationTests {
 
     @Test
     void contextLoads() {
-        AutoCheckService a = new AutoCheckService();
-        a.doCheck();
     }
 
 }

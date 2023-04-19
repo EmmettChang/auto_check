@@ -1,6 +1,2 @@
 server:
   port: 8088
-
-login:
-  username: 101237
-  password: 123abc

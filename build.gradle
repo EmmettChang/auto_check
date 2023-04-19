@@ -4,6 +4,44 @@ plugins {
     id 'org.springframework.boot' version '3.0.5'
     id 'io.spring.dependency-management' version '1.1.0'
 }
+plugins {
+
+    id 'org.openjfx.javafxplugin' version '0.0.8'
+
+}
+
+javafx {
+
+    version = "14"
+
+    modules = [ 'javafx.controls', 'javafx.fxml' ]
+
+}
+
+jar {
+    archiveFileName = 'AutoCheck.jar'
+    manifest {
+        attributes 'Main-Class': 'com.emmett.auto_check.AutoCheckApplication'
+    }
+}
+
+//jfx {
+//
+//    mainClass = 'com.emmett.auto_check.AutoCheckApplication.Main'
+//
+//    appName = 'AutoCheck'
+//
+//    vendor = 'ZJL'
+//
+//    version = '3.0.0'
+//
+//    jvmArgs = '-Xmx1024m'
+//
+//    allPermissions = true
+//
+//    nativeBundles = ['exe']
+//
+//}
 
 group = 'com.Emmett'
 version = '0.0.1-SNAPSHOT'
