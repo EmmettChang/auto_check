@@ -21,9 +21,11 @@ import java.io.Reader;
 @EnableScheduling
 @EnableAsync
 @ServletComponentScan
+@Slf4j
 public class AutoCheckApplication {
 
     public static void main(String[] args) {
+        SpringApplication.run(AutoCheckApplication.class, args);
         try(Reader reader = new FileReader("D:\\AutoCheck\\SysConfig.txt")) {
             SYSConfig sysConfig = new Gson().fromJson(reader, SYSConfig.class);
             AutoCheckService a = new AutoCheckService();
@@ -33,8 +35,8 @@ public class AutoCheckApplication {
         } catch (Exception e) {
             Logger logger = LoggerFactory.getLogger("E");
             logger.info(e.getMessage());
+            log.info(e.getMessage());
         }
-//        SpringApplication.run(AutoCheckApplication.class, args);
 
     }
 
