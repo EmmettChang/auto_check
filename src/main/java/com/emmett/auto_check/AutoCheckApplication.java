@@ -37,7 +37,7 @@ public class AutoCheckApplication {
             logger.info(e.getMessage());
             log.info(e.getMessage());
         }
-
+        System.exit(0);
     }
 
 }
