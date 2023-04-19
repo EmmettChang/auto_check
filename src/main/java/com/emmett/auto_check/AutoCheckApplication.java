@@ -26,15 +26,13 @@ public class AutoCheckApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(AutoCheckApplication.class, args);
-        try(Reader reader = new FileReader("D:\\AutoCheck\\SysConfig.txt")) {
+        try(Reader reader = new FileReader("D:\\AutoCheck\\Sys.config")) {
             SYSConfig sysConfig = new Gson().fromJson(reader, SYSConfig.class);
             AutoCheckService a = new AutoCheckService();
             for (SYSConfig.User user: sysConfig.getUsers()) {
                 a.doCheck(user.getId(), user.getPassword(), sysConfig);
             }
         } catch (Exception e) {
-            Logger logger = LoggerFactory.getLogger("E");
-            logger.info(e.getMessage());
             log.info(e.getMessage());
         }
         System.exit(0);

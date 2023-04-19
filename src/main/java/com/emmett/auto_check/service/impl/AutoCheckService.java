@@ -39,16 +39,8 @@ import static com.emmett.auto_check.constants.Api.*;
 @Service
 public class AutoCheckService implements IAutoCheckService {
 
-//    @Value("${login.username}")
-//    private String username;
-//    @Value("${login.password}")
-//    private String password;
-
-    /*每天九点执行*/
     @Override
-//    @Scheduled(cron = "0 0 9 * * ?")
     public void doCheck(String id, String pwd, SYSConfig sysConfig) {
-        Log log = LogFactory.getLog(AutoCheckService.class);
 
         RequetBody requetBody = new RequetBody();
         String efSecurityToken = "";
@@ -65,6 +57,7 @@ public class AutoCheckService implements IAutoCheckService {
         // 页面接口，获取token
         try {
             Response response = HttpUtil.jsonGet(LoginJspRequestUrl);
+            response.close();
         } catch (Exception e) {
             log.error(e.getMessage());
             throw new RuntimeException(e);
@@ -75,6 +68,7 @@ public class AutoCheckService implements IAutoCheckService {
             String loginUrl = String.format(Api.LoginRequestUrl, id, pwd);
             HashMap<String,String> loginParams = new HashMap<>();
             Response response = HttpUtil.formBodyPost(loginUrl, loginParams);
+            response.close();
         } catch (Exception e) {
             log.error(e.getMessage());
             throw new RuntimeException(e);
@@ -87,6 +81,7 @@ public class AutoCheckService implements IAutoCheckService {
             Document doc = Jsoup.parse(html);
             Element efSecurityTokenElement = doc.getElementById("efSecurityToken");
             efSecurityToken = efSecurityTokenElement.attr("value");
+            response.close();
         } catch (Exception e) {
             log.error(e.getMessage());
             throw new RuntimeException(e);
@@ -105,13 +100,14 @@ public class AutoCheckService implements IAutoCheckService {
             assert response.body() != null;
             QueryTaskReAndResBody queryTaskResultBody = new Gson().fromJson(response.body().string(), QueryTaskReAndResBody.class);
             rows = queryTaskResultBody.get__blocks__().getResult().getRows();
+            response.close();
         } catch (Exception e) {
             log.error(e.getMessage());
             throw new RuntimeException(e);
         }
 
         if (rows.size() == 0) {
-            log.info("***" + id + "：" + beginTime + "-" + endTime + "无点检");
+            log.error("[*" + id + "*]：" + beginTime + "-" + endTime + "无点检");
             return;
         }
 
@@ -155,6 +151,7 @@ public class AutoCheckService implements IAutoCheckService {
                     dataRow.add(detailRow.get(18));
                     updateTaskDetailRequestBody.get__blocks__().getResultXc().getRows().set(0, dataRow);
                     Response response = HttpUtil.jsonBodyPost(updateTaskDetailRequestUrl, updateTaskDetailRequestBody, "");
+                    response.close();
                 }
             }
         } catch (Exception e) {
@@ -180,7 +177,8 @@ public class AutoCheckService implements IAutoCheckService {
             }
 
             Response completedResponses = HttpUtil.jsonBodyPost(completedRequestUrl, completedRequestBody, efSecurityToken);
-            log.info("***" + id + "：" + beginTime + "-" + endTime + "点检数：" + rows.size());
+            completedResponses.close();
+            log.error("***" + id + "：" + beginTime + "-" + endTime + "点检数：" + rows.size());
         } catch (Exception e) {
             log.error(e.getMessage());
             throw new RuntimeException(e);
