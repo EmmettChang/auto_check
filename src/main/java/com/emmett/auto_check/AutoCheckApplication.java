@@ -5,8 +5,6 @@ import com.emmett.auto_check.service.impl.AutoCheckService;
 import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.ServletComponentScan;
@@ -30,10 +28,11 @@ public class AutoCheckApplication {
             SYSConfig sysConfig = new Gson().fromJson(reader, SYSConfig.class);
             AutoCheckService a = new AutoCheckService();
             for (SYSConfig.User user: sysConfig.getUsers()) {
-                a.doCheck(user.getId(), user.getPassword(), sysConfig);
+                a.doCheck(user, sysConfig);
             }
         } catch (Exception e) {
             log.info(e.getMessage());
+            throw new RuntimeException(e);
         }
         System.exit(0);
     }

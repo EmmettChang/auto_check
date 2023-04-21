@@ -11,6 +11,6 @@ import com.emmett.auto_check.config.SYSConfig;
  */
 public interface IAutoCheckService {
 
-    void doCheck(String username, String password, SYSConfig sysConfig);
+    void doCheck(SYSConfig.User user, SYSConfig sysConfig);
 
 }
