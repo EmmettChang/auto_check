@@ -14,8 +14,7 @@ import org.jsoup.nodes.Element;
 
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
+import javax.swing.*;
 import java.util.*;
 
 import static com.emmett.auto_check.constants.Api.*;
@@ -30,20 +29,10 @@ import static com.emmett.auto_check.constants.Api.*;
 @Service
 public class AutoCheckService implements IAutoCheckService {
 
-    private final RequetBody requetBody = new RequetBody();
+    private final RequestBody requetBody = new RequestBody();
 
     @Override
     public void doCheck(SYSConfig.User user, SYSConfig sysConfig) {
-
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        // 获取当月第一天
-//        LocalDate firstDayOfMonth = LocalDate.now().withDayOfMonth(1);
-//        String beginTime = sysConfig.getBeginTime().equals("") ? firstDayOfMonth.format(dateTimeFormatter) : sysConfig.getBeginTime();
-
-        // 获取今天
-        LocalDate today = LocalDate.now();
-        String beginTime = sysConfig.getBeginTime().equals("") ? today.format(dateTimeFormatter) : sysConfig.getBeginTime();
-        String endTime = sysConfig.getEndTime().equals("") ? today.format(dateTimeFormatter) : sysConfig.getEndTime();
 
         // 页面接口，获取token
         try {
@@ -51,6 +40,8 @@ public class AutoCheckService implements IAutoCheckService {
             response.close();
         } catch (Exception e) {
             log.error(e.getMessage());
+            JOptionPane.showMessageDialog(null, e.getMessage() +
+                    "\n\n如不能自行解决，不要关闭此窗口，截图联系yin_zjl@foxmail.com", "别动！", JOptionPane.ERROR_MESSAGE);
             throw new RuntimeException(e);
         }
 
@@ -62,6 +53,8 @@ public class AutoCheckService implements IAutoCheckService {
             response.close();
         } catch (Exception e) {
             log.error(e.getMessage());
+            JOptionPane.showMessageDialog(null, e.getMessage() +
+                    "\n\n如不能自行解决，不要关闭此窗口，截图联系yin_zjl@foxmail.com", "别动！", JOptionPane.ERROR_MESSAGE);
             throw new RuntimeException(e);
         }
 
@@ -78,6 +71,8 @@ public class AutoCheckService implements IAutoCheckService {
             response.close();
         } catch (Exception e) {
             log.error(e.getMessage());
+            JOptionPane.showMessageDialog(null, e.getMessage() +
+                    "\n\n如不能自行解决，不要关闭此窗口，截图联系yin_zjl@foxmail.com", "别动！", JOptionPane.ERROR_MESSAGE);
             throw new RuntimeException(e);
         }
         // 任务查询接口
@@ -87,8 +82,9 @@ public class AutoCheckService implements IAutoCheckService {
             queryTaskRequestBody.setEfSecurityToken(efSecurityToken);
             queryTaskRequestBody.setCOOKIE(MyCookieJar.getFixCookieValue());
             List<String> strings = queryTaskRequestBody.get__blocks__().getInqu_status().getRows().get(0);
-            strings.set(2, beginTime);
-            strings.set(3, endTime);
+            strings.set(2, sysConfig.getBeginTime());
+            strings.set(3, sysConfig.getEndTime());
+            queryTaskRequestBody.get__blocks__().getResult().getAttr().setLimit(sysConfig.getLimit());
             Response response = HttpUtil.jsonBodyPost(queryTaskRequestUrl, queryTaskRequestBody, efSecurityToken);
             assert response.body() != null;
             QueryTaskReAndResBody queryTaskResultBody = new Gson().fromJson(response.body().string(), QueryTaskReAndResBody.class);
@@ -96,11 +92,13 @@ public class AutoCheckService implements IAutoCheckService {
             response.close();
         } catch (Exception e) {
             log.error(e.getMessage());
+            JOptionPane.showMessageDialog(null, e.getMessage() +
+                    "\n\n如不能自行解决，不要关闭此窗口，截图联系yin_zjl@foxmail.com", "别动！", JOptionPane.ERROR_MESSAGE);
             throw new RuntimeException(e);
         }
 
         if (rows.size() == 0) {
-            log.error("[*" + user.getName() + "*]：" + beginTime + "-" + endTime + "无点检或已点检");
+            log.error("[*" + user.getName() + "*]：" + sysConfig.getBeginTime() + "-" + sysConfig.getEndTime() + "无点检或已点检");
             return;
         }
 
@@ -108,18 +106,31 @@ public class AutoCheckService implements IAutoCheckService {
         try {
             CompletedRequestBody completedRequestBody = new Gson().fromJson(requetBody.getCompletedRequetBodyString(), CompletedRequestBody.class);
             //TODO:异步处理更新
-            update(rows, completedRequestBody, sysConfig, beginTime, endTime);
+            update(rows, completedRequestBody, sysConfig);
             Response completedResponses = HttpUtil.jsonBodyPost(completedRequestUrl, completedRequestBody, efSecurityToken);
+            assert completedResponses.body() != null;
+            CompleteResultBody completeResultBody = new Gson().fromJson(completedResponses.body().string(), CompleteResultBody.class);
             completedResponses.close();
-            log.error("[*" + user.getName() + "*]：" + beginTime + "-" + endTime + "点检数：" + rows.size());
+            if (completeResultBody.get__sys__().getStatus() == 0) {
+                log.error("[*" + user.getName() + "*]：" + sysConfig.getBeginTime() + "-" + sysConfig.getEndTime() + "点检数：" + rows.size());
+            } else {
+                log.error("[*" + user.getName() + "*]：" + sysConfig.getBeginTime() + "-" + sysConfig.getEndTime() + "点检提交失败：" + completeResultBody.get__sys__().getMsg());
+                log.error("[*" + user.getName() + "*]：" + sysConfig.getBeginTime() + "-" + sysConfig.getEndTime() + "失败详情：" + completeResultBody.get__sys__().getDetailMsg());
+                JOptionPane.showMessageDialog(null, "长辈解锁成就：探索者；同龄人解锁成就：笨蛋\n\n"
+                        + user.getName() + "点检提交失败!\n" + completeResultBody.get__sys__().getMsg()
+                        + "\n************热心建议************：检查配置干嘛，愣着啊\n"
+                        + "如不能自行解决，不要关闭此窗口，截图联系yin_zjl@foxmail.com", "恭喜！", JOptionPane.QUESTION_MESSAGE);
+            }
         } catch (Exception e) {
             log.error(e.getMessage());
+            JOptionPane.showMessageDialog(null, e.getMessage() +
+                    "\n\n如不能自行解决，不要关闭此窗口，截图联系yin_zjl@foxmail.com", "别动！", JOptionPane.ERROR_MESSAGE);
             throw new RuntimeException(e);
         }
 
     }
 
-    private void update(List<List<String>> rows, CompletedRequestBody completedRequestBody, SYSConfig sysConfig, String beginTime, String endTime) {
+    private void update(List<List<String>> rows, CompletedRequestBody completedRequestBody, SYSConfig sysConfig) {
 
         try {
 
@@ -143,8 +154,8 @@ public class AutoCheckService implements IAutoCheckService {
                     UpdateTaskDetailRequestBody updateTaskDetailRequestBody = new Gson().fromJson(requetBody.getUpdateTaskDetailRequetBodyString(), UpdateTaskDetailRequestBody.class);
                     temp = updateTaskDetailRequestBody.get__blocks__().getInqu_status().getRows().get(0);
                     temp.set(0, detailRow.get(3));
-                    temp.set(2, beginTime);
-                    temp.set(3, endTime);
+                    temp.set(2, sysConfig.getBeginTime());
+                    temp.set(3, sysConfig.getEndTime());
                     dataRow.clear();
                     dataRow.add(detailRow.get(13));
                     dataRow.add(detailRow.get(19));
@@ -171,6 +182,8 @@ public class AutoCheckService implements IAutoCheckService {
             }
         } catch (Exception e) {
             log.error(e.getMessage());
+            JOptionPane.showMessageDialog(null, e.getMessage() +
+                    "\n\n如不能自行解决，不要关闭此窗口，截图联系yin_zjl@foxmail.com", "别动！", JOptionPane.ERROR_MESSAGE);
             throw new RuntimeException(e);
         }
 
